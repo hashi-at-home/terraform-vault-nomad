@@ -36,7 +36,9 @@ examples themselves
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >1.2.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >1.9.0 |
+| <a name="requirement_nomad"></a> [nomad](#requirement\_nomad) | 2.3.0 |
+| <a name="requirement_vault"></a> [vault](#requirement\_vault) | ~> 4 |
 
 ## Providers
 
@@ -52,9 +54,7 @@ No resources.
 
 ## Inputs
 
-| Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| <a name="input_dummy"></a> [dummy](#input\_dummy) | dummy variable | `string` | n/a | yes |
+No inputs.
 
 ## Outputs
 

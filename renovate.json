@@ -24,7 +24,7 @@
       {
         "matchDepNames": ["devDependencies"],
         "matchUpdateTypes": ["minor", "patch"],
-        "automerge": true
+      "automerge": true
       }
     ]
 }

@@ -1,21 +1,20 @@
-# This is the default example
-# customise it as you see fit for your example usage of your module
+provider "nomad" {
+  # Configuration options
+}
 
-# add provider configurations here, for example:
-# provider "aws" {
-#
-# }
+provider "vault" {
+
+}
 
 # Declare your backends and other terraform configuration here
 # This is an example for using the consul backend.
-# terraform {
-#   backend "consul" {
-#     path = "test_module/simple"
-#   }
-# }
+terraform {
+  backend "consul" {
+    path = "terraform/modules/vault-nomad"
+  }
+}
 
 
 module "example" {
   source = "../../"
-  dummy  = "test"
 }
