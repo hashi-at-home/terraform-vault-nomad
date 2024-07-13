@@ -15,6 +15,8 @@ jobs:
     name: validate
     env:
       NOMAD_ADDR: http://localhost:4646
+      VAULT_ADDR: http://localhost:8200
+      VAULT_TOKEN: ${{ github.run_id}}
       TF_VAR_nomad_addr: http://localhost:4646
     runs-on: ubuntu-22.04
     services:
@@ -30,6 +32,8 @@ jobs:
         image: hashicorp/vault:1.17.2
         ports:
           - 8200:8200
+        env:
+          VAULT_DEV_ROOT_TOKEN_ID: ${{ env.VAULT_TOKEN }}
     steps:
       - name: Checkout code
         uses: 'actions/checkout@v4'
