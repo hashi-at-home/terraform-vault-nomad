@@ -19,6 +19,14 @@ jobs:
         image: hashicorp/consul:1.19.1
         ports:
           - 8500:8500
+      nomad:
+        image: hashicorp/nomad:1.8.1
+        ports:
+          - 4646:4646
+      vault:
+        image: hashicorp/vault:1.17.2
+        ports:
+          - 8200:8200
     steps:
       - name: Checkout code
         uses: 'actions/checkout@v4'
@@ -32,6 +40,8 @@ jobs:
         run: ./terraform -chdir=examples/${{ matrix.example }} init
       - name: Validate terraform
         run: ./terraform -chdir=examples/${{ matrix.example }} validate
+      - name: Test
+        run: ./terraform test
   release:
     needs:
       - validate

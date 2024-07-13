@@ -37,12 +37,14 @@ examples themselves
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >1.9.0 |
-| <a name="requirement_nomad"></a> [nomad](#requirement\_nomad) | 2.3.0 |
+| <a name="requirement_nomad"></a> [nomad](#requirement\_nomad) | ~> 2 |
 | <a name="requirement_vault"></a> [vault](#requirement\_vault) | ~> 4 |
 
 ## Providers
 
-No providers.
+| Name | Version |
+|------|---------|
+| <a name="provider_nomad"></a> [nomad](#provider\_nomad) | 2.3.0 |
 
 ## Modules
 
@@ -50,7 +52,9 @@ No modules.
 
 ## Resources
 
-No resources.
+| Name | Type |
+|------|------|
+| [nomad_acl_token.management](https://registry.terraform.io/providers/hashicorp/nomad/latest/docs/resources/acl_token) | resource |
 
 ## Inputs
 
