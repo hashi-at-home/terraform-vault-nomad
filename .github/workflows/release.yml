@@ -40,6 +40,8 @@ jobs:
         run: ./terraform -chdir=examples/${{ matrix.example }} init
       - name: Validate terraform
         run: ./terraform -chdir=examples/${{ matrix.example }} validate
+      - name: Init
+        run: ./terraform init
       - name: Test
         run: ./terraform test
   release:
