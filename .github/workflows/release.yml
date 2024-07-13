@@ -13,6 +13,9 @@ jobs:
         example:
           - simple
     name: validate
+    env:
+      NOMAD_ADDR: http://localhost:4646
+      TF_VAR_nomad_addr: http://localhost:4646
     runs-on: ubuntu-22.04
     services:
       consul:
