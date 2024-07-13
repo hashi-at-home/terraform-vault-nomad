@@ -15,9 +15,10 @@ jobs:
     name: validate
     runs-on: ubuntu-22.04
     services:
-      image: consul
-      ports:
-        - 8500:8500
+      consul:
+        image: consul
+        ports:
+          - 8500:8500
     steps:
       - name: Checkout code
         uses: 'actions/checkout@v4'
