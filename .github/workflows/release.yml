@@ -21,8 +21,8 @@ jobs:
           fetch-depth: 0
       - name: Get Terraform
         run: |
-          curl -fSL https://releases.hashicorp.com/terraform/1.9.2/terraform_1.9.2_linux_amd64.zip \
-          | unzip - -j terraform > terraform
+          curl -fSLO https://releases.hashicorp.com/terraform/1.9.2/terraform_1.9.2_linux_amd64.zip
+          unzip -j terraform_1.9.2_linux_amd64.zip terraform
       - name: Init terraform
         run: ./terraform -chdir=examples/${{ matrix.example }} init
       - name: Validate terraform
