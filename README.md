@@ -45,6 +45,7 @@ examples themselves
 | Name | Version |
 |------|---------|
 | <a name="provider_nomad"></a> [nomad](#provider\_nomad) | 2.3.0 |
+| <a name="provider_vault"></a> [vault](#provider\_vault) | 4.3.0 |
 
 ## Modules
 
@@ -55,10 +56,13 @@ No modules.
 | Name | Type |
 |------|------|
 | [nomad_acl_token.management](https://registry.terraform.io/providers/hashicorp/nomad/latest/docs/resources/acl_token) | resource |
+| [vault_nomad_secret_backend.catch_all](https://registry.terraform.io/providers/hashicorp/vault/latest/docs/resources/nomad_secret_backend) | resource |
 
 ## Inputs
 
-No inputs.
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_nomad_addr"></a> [nomad\_addr](#input\_nomad\_addr) | Nomad Address | `string` | `"http://localhost:4646"` | no |
 
 ## Outputs
 
