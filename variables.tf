@@ -23,3 +23,9 @@ variable "nomad_pki_int_mount_path" {
   default     = "pki_hah_nomad_int"
   type        = string
 }
+
+variable "nomad_jwt_auth_path" {
+  description = "Path we will mount the JWT auth mechanism on for Nomad"
+  default     = "nomad_jwt"
+  type        = string
+}

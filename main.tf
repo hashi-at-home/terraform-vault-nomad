@@ -39,23 +39,45 @@ resource "vault_policy" "nomad_server" {
   })
 }
 
-# resource "vault_policy" "nomad_read" {
-#   name   = "nomad-read"
-#   policy = templatefile("${path.module}/policies/nomad-read.hcl.tmpl", { pki_mount = vault_mount.pki_hah_nomad_int.path })
-# }
+resource "vault_policy" "nomad_read" {
+  name   = "nomad-read"
+  policy = templatefile("${path.module}/policies/nomad-read.hcl.tmpl", { pki_mount = var.nomad_pki_int_mount_path })
+}
 
-# resource "vault_policy" "nomad_tls" {
-#   name   = "nomad-tls"
-#   policy = templatefile("${path.module}/policies/nomad-tls.hcl.tmpl", { pki_mount = vault_mount.pki_hah_nomad_int.path })
-# }
+resource "vault_policy" "nomad_tls" {
+  name   = "nomad-tls"
+  policy = templatefile("${path.module}/policies/nomad-tls.hcl.tmpl", { pki_mount = var.nomad_pki_int_mount_path })
+}
 
-# # Vault mTLS
-# # CA for Hashi at home
-# resource "vault_mount" "pki_hah_nomad" {
-#   path        = "pki_hah_nomad"
-#   description = "CA for Nomad at home services"
-#   type        = "pki"
+resource "vault_policy" "nomad_workloads" {
+  name   = "nomad-workloads"
+  policy = file("${path.module}/policies/nomad-workloads.hcl")
+}
 
-#   default_lease_ttl_seconds = "604800"
-#   max_lease_ttl_seconds     = "315360000"
-# }
+resource "vault_jwt_auth_backend" "nomad" {
+  description        = "Vault JWT Auth for Nomad"
+  path               = var.nomad_jwt_auth_path
+  type               = "jwt"
+  jwks_url           = "${var.nomad_addr}/.well-known/jwks.json"
+  jwt_supported_algs = ["RS256", "EdDSA"]
+  # default_role       = vault_jwt_auth_backend_role.nomad_jobs.role_name
+  default_role = "nomad-workloads"
+}
+
+
+resource "vault_jwt_auth_backend_role" "nomad_jobs" {
+  backend                 = vault_jwt_auth_backend.nomad.path
+  role_name               = "nomad-workloads"
+  role_type               = "jwt"
+  bound_audiences         = ["vault.io"]
+  user_claim              = "/nomad_job_id"
+  user_claim_json_pointer = true
+  claim_mappings = {
+    "nomad_job_id" = "nomad_job_id"
+    "nomad_task"   = "nomad_task"
+  }
+  token_type             = "service"
+  token_policies         = [vault_policy.nomad_workloads.name]
+  token_period           = 3600
+  token_explicit_max_ttl = 0
+}
