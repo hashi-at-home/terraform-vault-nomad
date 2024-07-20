@@ -21,9 +21,9 @@ jobs:
     outputs:
       url: ${{ steps.hashi_artifacts.outputs.url }}
     steps:
-      - id: version
+      - id: hashi_artifacts
         name: Get Latest Version of ${{ matrix.product }}
-        run: curl -s https://${RELEASES_URL}/v1/releases/${{ matrix.product }}?limit=20&license_class=oss | jq -r '.[0].builds[] | select (.arch == "amd64" and .os=="linux").version' >> $GITHUB_OUTPUT
+        run: echo "${{ matrix.product }}_URL=$(curl -s https://${RELEASES_URL}/v1/releases/${{ matrix.product }}?limit=20&license_class=oss | jq -r '.[0].builds[] | select (.arch == \"amd64\" and .os==\"linux\").version')" >> "$GITHUB_OUTPUT"
   hashi_versions:
     strategy:
       matrix:
@@ -37,7 +37,8 @@ jobs:
     outputs:
       version: ${{ steps.hashi_versions.outputs.version }}
     steps:
-      - name: Get Latest Version of ${{ matrix.product }}
+      - id: version
+        name: Get Latest Version of ${{ matrix.product }}
         run: curl -s https://${RELEASES_URL}/v1/releases/${{ matrix.product }}?limit=20&license_class=oss | jq -r '.[0].version' >> $GITHUB_OUTPUT
   validate:
     needs:
