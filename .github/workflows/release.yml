@@ -56,20 +56,20 @@ jobs:
       TF_VAR_nomad_addr: http://localhost:4646
       OUTPUTS: ${{ needs.hashi_versions.outputs.version }}
     runs-on: ubuntu-22.04
-    services:
-      consul:
-        image: hashicorp/consul:1.19.1
-        ports:
-          - 8500:8500
-      vault:
-        image: hashicorp/vault:1.17.2
-        ports:
-          - 8200:8200
-        env:
-          VAULT_DEV_ROOT_TOKEN_ID: ${{ env.VAULT_TOKEN }}
+    # services:
+    #   consul:
+    #     image: hashicorp/consul:1.19.1
+    #     ports:
+    #       - 8500:8500
+    #   vault:
+    #     image: hashicorp/vault:1.17.2
+    #     ports:
+    #       - 8200:8200
+    #     env:
+    #       VAULT_DEV_ROOT_TOKEN_ID: ${{ env.VAULT_TOKEN }}
     steps:
       - name: test
-        run: echo ${OUTPUTS}
+        run: echo ${OUTPUTS} && echo ${GITHUB_OUTPUT}
       - name: Checkout code
         uses: 'actions/checkout@v4'
         with:
