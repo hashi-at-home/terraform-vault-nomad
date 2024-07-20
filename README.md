@@ -56,13 +56,19 @@ No modules.
 | Name | Type |
 |------|------|
 | [nomad_acl_token.management](https://registry.terraform.io/providers/hashicorp/nomad/latest/docs/resources/acl_token) | resource |
-| [vault_nomad_secret_backend.catch_all](https://registry.terraform.io/providers/hashicorp/vault/latest/docs/resources/nomad_secret_backend) | resource |
+| [vault_nomad_secret_backend.nomad](https://registry.terraform.io/providers/hashicorp/vault/latest/docs/resources/nomad_secret_backend) | resource |
+| [vault_nomad_secret_role.mgmt](https://registry.terraform.io/providers/hashicorp/vault/latest/docs/resources/nomad_secret_role) | resource |
+| [vault_policy.nomad_monitoring](https://registry.terraform.io/providers/hashicorp/vault/latest/docs/resources/policy) | resource |
+| [vault_policy.nomad_server](https://registry.terraform.io/providers/hashicorp/vault/latest/docs/resources/policy) | resource |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_nomad_addr"></a> [nomad\_addr](#input\_nomad\_addr) | Nomad Address | `string` | `"http://localhost:4646"` | no |
+| <a name="input_nomad_backend"></a> [nomad\_backend](#input\_nomad\_backend) | Name of the Nomad secrets mount on Vault | `string` | `"nomad"` | no |
+| <a name="input_nomad_pki_int_mount_path"></a> [nomad\_pki\_int\_mount\_path](#input\_nomad\_pki\_int\_mount\_path) | Path of the PKI mount which issues certificates to the Nomad cluster nodes | `string` | `"pki_hah_nomad_int"` | no |
+| <a name="input_nomad_token_role_name"></a> [nomad\_token\_role\_name](#input\_nomad\_token\_role\_name) | Name of the role in Vault with which to issue the token | `string` | `"nomad-cluster"` | no |
 
 ## Outputs
 

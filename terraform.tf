@@ -20,5 +20,3 @@ terraform {
     }
   }
 }
-
-provider "nomad" {}

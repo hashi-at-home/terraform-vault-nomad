@@ -5,3 +5,12 @@ run "acl_token" {
         error_message = "Incorrect token name."
     }
 }
+
+variables {
+    nomad_addr    = "http://nomad.service.consul:4646"
+    nomad_backend = "nomad_test"
+}
+
+run "e2e" {
+    command = apply
+}
