@@ -53,7 +53,7 @@ jobs:
       VAULT_ADDR: http://localhost:8200
       VAULT_TOKEN: ${{ github.run_id }}
       TF_VAR_nomad_addr: http://localhost:4646
-      # CONSUL_VERSION: ${{ needs.hashi_version.outputs.version }}
+      OUTPUTS: ${{ needs.hashi_version.outputs.version }}
     runs-on: ubuntu-22.04
     services:
       consul:
@@ -68,7 +68,7 @@ jobs:
           VAULT_DEV_ROOT_TOKEN_ID: ${{ env.VAULT_TOKEN }}
     steps:
       - name: test
-        run: echo ${{ needs.hashi_version.outputs.version }}
+        run: echo $OUTPUTS
       - name: Checkout code
         uses: 'actions/checkout@v4'
         with:
