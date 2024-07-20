@@ -7,7 +7,31 @@ on:
     branches:
       - main
 jobs:
+  hashi_versions:
+    strategy:
+      matrix:
+        product:
+          - nomad
+          - terraform
+          - vault
+    runs-on: ubuntu-latest
+    env:
+      RELEASE_URL: https://api.releases.hashicorp.com
+    steps:
+      - name: Get Latest Version of ${{ matrix.product }}
+        run: >-
+          curl -s \
+          https://${RELEASES_URL}/v1/releases/${{ matrix.product }}\
+          ?limit=20\
+          &license_class=oss \
+          | jq -r \
+          '.[0].builds[] \
+            | select (.arch == "amd64" and .os=="linux")\
+          .url' >> $GITHUB_OUTPUT
+
   validate:
+    needs:
+      - hashi_versions
     strategy:
       matrix:
         example:
@@ -24,10 +48,6 @@ jobs:
         image: hashicorp/consul:1.19.1
         ports:
           - 8500:8500
-      nomad:
-        image: hashicorp/nomad:1.8.2
-        ports:
-          - 4646:4646
       vault:
         image: hashicorp/vault:1.17.2
         ports:
@@ -39,7 +59,7 @@ jobs:
         uses: 'actions/checkout@v4'
         with:
           fetch-depth: 0
-      - name: Get Terraform
+      - name: Get latest Terraform
         run: |
           curl -fSLO https://releases.hashicorp.com/terraform/1.9.2/terraform_1.9.2_linux_amd64.zip
           unzip -j terraform_1.9.2_linux_amd64.zip terraform
