@@ -19,7 +19,7 @@ jobs:
       RELEASE_URL: https://api.releases.hashicorp.com
     steps:
       - name: Get Latest Version of ${{ matrix.product }}
-        run: >-
+        run: >
           curl -s \
           https://${RELEASES_URL}/v1/releases/${{ matrix.product }}\
           ?limit=20\
