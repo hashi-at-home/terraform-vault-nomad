@@ -35,7 +35,7 @@ jobs:
     env:
       RELEASE_URL: https://api.releases.hashicorp.com
     outputs:
-      version: ${{ steps.hashi_version.outputs.version }}
+      version: ${{ steps.hashi_versions.outputs.version }}
     steps:
       - name: Get Latest Version of ${{ matrix.product }}
         run: curl -s https://${RELEASES_URL}/v1/releases/${{ matrix.product }}?limit=20&license_class=oss | jq -r '.[0].version' >> $GITHUB_OUTPUT
@@ -68,7 +68,7 @@ jobs:
           VAULT_DEV_ROOT_TOKEN_ID: ${{ env.VAULT_TOKEN }}
     steps:
       - name: test
-        run: echo $OUTPUTS
+        run: echo $}
       - name: Checkout code
         uses: 'actions/checkout@v4'
         with:
