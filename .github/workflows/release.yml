@@ -19,15 +19,7 @@ jobs:
       RELEASE_URL: https://api.releases.hashicorp.com
     steps:
       - name: Get Latest Version of ${{ matrix.product }}
-        run: |-
-          curl -s \
-          https://${RELEASES_URL}/v1/releases/${{ matrix.product }}\
-          ?limit=20\
-          &license_class=oss \
-          | jq -r \
-          '.[0].builds[] \
-            | select (.arch == "amd64" and .os=="linux")\
-          .url' >> $GITHUB_OUTPUT
+        run: curl -s https://${RELEASES_URL}/v1/releases/${{ matrix.product }}?limit=20&license_class=oss | jq -r '.[0].builds[] | select (.arch == "amd64" and .os=="linux").url' >> $GITHUB_OUTPUT
 
   validate:
     needs:
