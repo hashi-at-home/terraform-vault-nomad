@@ -7,7 +7,7 @@ on:
     branches:
       - main
 jobs:
-  hashi_artifacts:
+  artifact:
     strategy:
       matrix:
         product:
@@ -18,13 +18,13 @@ jobs:
     runs-on: ubuntu-latest
     env:
       RELEASE_URL: https://api.releases.hashicorp.com
-    outputs:
-      url: ${{ steps.hashi_artifacts.outputs.url }}
+    # outputs:
+      # ${{ matrix.product }}_URL: ${{ steps.artifacts.outputs.url }}
     steps:
       - id: artifacts
         name: Get Latest Version of ${{ matrix.product }}
         run: echo ${{ matrix.product }}_URL=$(curl -s "${RELEASE_URL}/v1/releases/${{ matrix.product }}?limit=20&license_class=oss" | jq -r '.[0].builds[] | select (.arch == "amd64" and .os=="linux").url') >> "$GITHUB_OUTPUT"
-  hashi_versions:
+  version:
     strategy:
       matrix:
         product:
@@ -35,16 +35,17 @@ jobs:
     runs-on: ubuntu-latest
     env:
       RELEASE_URL: https://api.releases.hashicorp.com
-    outputs:
-      version: ${{ steps.hashi_versions.outputs.version }}
+    # outputs:
+      # ${{ matrix.product }}_version: ${{
+        #  steps.hashi_versions.outputs.version }}
     steps:
-      - id: version
+      - id: versions
         name: Get Latest Version of ${{ matrix.product }}
         run: echo ${{ matrix.product }}_VERSION=$(curl -s "${RELEASE_URL}/v1/releases/${{ matrix.product }}?limit=20&license_class=oss" | jq -r '.[0].version') >> "$GITHUB_OUTPUT"
   validate:
     needs:
-      - hashi_versions
-      - hashi_artifacts
+      - version
+      - artifact
     strategy:
       matrix:
         example:
@@ -57,23 +58,23 @@ jobs:
       TF_VAR_nomad_addr: http://localhost:4646
       VERSIONS: ${{ needs.hashi_versions.outputs.version }}
       TERRAFORM_URL: ${{ needs.artifacts.outputs.terraform_URL }}
-      TERRAFORM_VERSION: ${{ needs.version.outputs.terraform_VERSION}}
+      TERRAFORM_VERSION: ${{ needs.version.outputs.terraform_VERSION }}
       VAULT_URL: ${{ needs.artifacts.outputs.vault_URL }}
       VAULT_VERSION: ${{ needs.version.outputs.vault_VERSION }}
-      CONSUL_URL: ${{ needs.artifacts.outputs.consl_URL }}
+      CONSUL_URL: ${{ needs.artifacts.outputs.consul_URL }}
       CONSUL_VERSION: ${{ needs.version.outputs.consul_VERSION }}
     runs-on: ubuntu-22.04
-    services:
-      consul:
-        image: hashicorp/consul:${CONSUL_VERSION}
-        ports:
-          - 8500:8500
-      vault:
-        image: hashicorp/vault:${VAULT_VERSION}
-        ports:
-          - 8200:8200
-        env:
-          VAULT_DEV_ROOT_TOKEN_ID: ${{ env.VAULT_TOKEN }}
+    # services:
+    #   consul:
+    #     image: hashicorp/consul:${CONSUL_VERSION}
+    #     ports:
+    #       - 8500:8500
+    #   vault:
+    #     image: hashicorp/vault:${VAULT_VERSION}
+    #     ports:
+    #       - 8200:8200
+    #     env:
+    #       VAULT_DEV_ROOT_TOKEN_ID: ${{ env.VAULT_TOKEN }}
     steps:
       - name: test
         run: echo $GITHUB_OUTPUT
