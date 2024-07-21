@@ -21,7 +21,7 @@ jobs:
     outputs:
       url: ${{ steps.hashi_artifacts.outputs.url }}
     steps:
-      - id: hashi_artifacts
+      - id: artifacts
         name: Get Latest Version of ${{ matrix.product }}
         run: echo "${{ matrix.product }}_URL=$(curl -s https://${RELEASES_URL}/v1/releases/${{ matrix.product }}?limit=20&license_class=oss | jq -r '.[0].builds[] | select (.arch == \"amd64\" and .os==\"linux\").version')" >> "$GITHUB_OUTPUT"
   hashi_versions:
@@ -39,7 +39,7 @@ jobs:
     steps:
       - id: version
         name: Get Latest Version of ${{ matrix.product }}
-        run: curl -s https://${RELEASES_URL}/v1/releases/${{ matrix.product }}?limit=20&license_class=oss | jq -r '.[0].version' >> $GITHUB_OUTPUT
+        run: echo "${{ matrix.product }}_VERSION=$(curl -s https://${RELEASES_URL}/v1/releases/${{ matrix.product }}?limit=20&license_class=oss | jq -r '.[0].version)'" >> "$GITHUB_OUTPUT"
   validate:
     needs:
       - hashi_versions
@@ -54,7 +54,9 @@ jobs:
       VAULT_ADDR: http://localhost:8200
       VAULT_TOKEN: ${{ github.run_id }}
       TF_VAR_nomad_addr: http://localhost:4646
-      OUTPUTS: ${{ needs.hashi_versions.outputs.version }}
+      VERSIONS: ${{ needs.hashi_versions.outputs.version }}
+      CONSUL_URL: ${{ needs.artifacts.outputs.consul_URL }}
+      CONSUL_VERSION: ${{ needs.version.outputs.consul_VERSION}}
     runs-on: ubuntu-22.04
     # services:
     #   consul:
@@ -69,7 +71,7 @@ jobs:
     #       VAULT_DEV_ROOT_TOKEN_ID: ${{ env.VAULT_TOKEN }}
     steps:
       - name: test
-        run: echo ${OUTPUTS} && echo ${GITHUB_OUTPUT}
+        run: echo ${GITHUB_OUTPUT}
       - name: Checkout code
         uses: 'actions/checkout@v4'
         with:
