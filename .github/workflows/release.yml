@@ -23,7 +23,7 @@ jobs:
     steps:
       - id: artifacts
         name: Get Latest Version of ${{ matrix.product }}
-        run: echo ${{ matrix.product }}_URL=$(curl -s "${RELEASE_URL}/v1/releases/${{ matrix.product }}?limit=20&license_class=oss" | jq -r '.[0].builds[] | select (.arch == "amd64" and .os=="linux").version') >> "$GITHUB_OUTPUT"
+        run: echo ${{ matrix.product }}_URL=$(curl -s "${RELEASE_URL}/v1/releases/${{ matrix.product }}?limit=20&license_class=oss" | jq -r '.[0].builds[] | select (.arch == "amd64" and .os=="linux").url') >> "$GITHUB_OUTPUT"
   hashi_versions:
     strategy:
       matrix:
