@@ -39,7 +39,7 @@ jobs:
     steps:
       - id: version
         name: Get Latest Version of ${{ matrix.product }}
-        run: echo "${{ matrix.product }}_VERSION=$(curl -s https://${RELEASES_URL}/v1/releases/${{ matrix.product }}?limit=20&license_class=oss | jq -r '.[0].version)'" >> "$GITHUB_OUTPUT"
+        run: echo "${{ matrix.product }}_VERSION=$(curl -s https://${RELEASES_URL}/v1/releases/${{ matrix.product }}?limit=20&license_class=oss | jq -r '.[0].version')" >> "$GITHUB_OUTPUT"
   validate:
     needs:
       - hashi_versions
