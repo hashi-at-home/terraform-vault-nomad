@@ -56,12 +56,12 @@ jobs:
       VAULT_ADDR: http://localhost:8200
       VAULT_TOKEN: ${{ github.run_id }}
       TF_VAR_nomad_addr: http://localhost:4646
-      VERSIONS: ${{ needs.hashi_versions.outputs.version }}
-      TERRAFORM_URL: ${{ needs.artifacts.outputs.terraform_URL }}
+      VERSIONS: ${{ needs.version.outputs.version }}
+      TERRAFORM_URL: ${{ needs.artifact.outputs.terraform_URL }}
       TERRAFORM_VERSION: ${{ needs.version.outputs.terraform_VERSION }}
-      VAULT_URL: ${{ needs.artifacts.outputs.vault_URL }}
+      VAULT_URL: ${{ needs.artifact.outputs.vault_URL }}
       VAULT_VERSION: ${{ needs.version.outputs.vault_VERSION }}
-      CONSUL_URL: ${{ needs.artifacts.outputs.consul_URL }}
+      CONSUL_URL: ${{ needs.artifact.outputs.consul_URL }}
       CONSUL_VERSION: ${{ needs.version.outputs.consul_VERSION }}
     runs-on: ubuntu-22.04
     # services:
