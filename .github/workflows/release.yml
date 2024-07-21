@@ -23,7 +23,7 @@ jobs:
     steps:
       - id: artifacts
         name: Get Latest Version of ${{ matrix.product }}
-        run: echo "${{ matrix.product }}_URL=$(curl -s https://${RELEASE_URL}/v1/releases/${{ matrix.product }}?limit=20&license_class=oss | jq -r '.[0].builds[] | select (.arch == \"amd64\" and .os==\"linux\").version')" >> "$GITHUB_OUTPUT"
+        run: echo ${{ matrix.product }}_URL=$(curl -s https://${RELEASE_URL}/v1/releases/${{ matrix.product }}?limit=20&license_class=oss | jq -r '.[0].builds[] | select (.arch == "amd64" and .os=="linux").version') >> "$GITHUB_OUTPUT"
   hashi_versions:
     strategy:
       matrix:
@@ -55,31 +55,35 @@ jobs:
       VAULT_TOKEN: ${{ github.run_id }}
       TF_VAR_nomad_addr: http://localhost:4646
       VERSIONS: ${{ needs.hashi_versions.outputs.version }}
-      CONSUL_URL: ${{ needs.artifacts.outputs.consul_URL }}
-      CONSUL_VERSION: ${{ needs.version.outputs.consul_VERSION}}
+      TERRAFORM_URL: ${{ needs.artifacts.outputs.terraform_URL }}
+      TERRAFORM_VERSION: ${{ needs.version.outputs.terraform_VERSION}}
+      VAULT_URL: ${{ needs.artifacts.outputs.vault_URL }}
+      VAULT_VERSION: ${{ needs.version.outputs.vault_VERSION }}
+      CONSUL_URL: ${{ needs.artifacts.outputs.consl_URL }}
+      CONSUL_VERSION: ${{ needs.version.outputs.consul_VERSION }}
     runs-on: ubuntu-22.04
-    # services:
-    #   consul:
-    #     image: hashicorp/consul:1.19.1
-    #     ports:
-    #       - 8500:8500
-    #   vault:
-    #     image: hashicorp/vault:1.17.2
-    #     ports:
-    #       - 8200:8200
-    #     env:
-    #       VAULT_DEV_ROOT_TOKEN_ID: ${{ env.VAULT_TOKEN }}
+    services:
+      consul:
+        image: hashicorp/consul:${CONSUL_VERSION}
+        ports:
+          - 8500:8500
+      vault:
+        image: hashicorp/vault:${VAULT_VERSION}
+        ports:
+          - 8200:8200
+        env:
+          VAULT_DEV_ROOT_TOKEN_ID: ${{ env.VAULT_TOKEN }}
     steps:
       - name: test
-        run: echo ${GITHUB_OUTPUT}
+        run: echo $GITHUB_OUTPUT
       - name: Checkout code
         uses: 'actions/checkout@v4'
         with:
           fetch-depth: 0
       - name: Get latest Terraform
         run: |
-          curl -fSLO https://releases.hashicorp.com/terraform/1.9.2/terraform_1.9.2_linux_amd64.zip
-          unzip -j terraform_1.9.2_linux_amd64.zip terraform
+          curl -fSLO ${terraform_URL}
+          unzip -j terraform_${terraform_VERSION}_linux_amd64.zip terraform
       - name: Init terraform
         run: ./terraform -chdir=examples/${{ matrix.example }} init
       - name: Validate terraform
