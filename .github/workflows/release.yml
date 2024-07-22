@@ -129,7 +129,10 @@ jobs:
         run: |
           ./nomad agent -server -bootstrap-expect=1 -vault-enabled -vault-token=${VAULT_TOKEN}  -data-dir=/tmp -acl-enabled &
       - name: Set Nomad ACL token
-        run: echo ${NOMAD_TOKEN} | ./nomad acl bootstrap -
+        run: |
+          ./nomad acl bootstrap -
+          ${NOMAD_TOKEN}
+          EOF
       - name: Test
         run: ./terraform test
   release:
