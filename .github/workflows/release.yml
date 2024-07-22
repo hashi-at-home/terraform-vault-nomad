@@ -100,11 +100,11 @@ jobs:
         ports:
           - 4646:4646
       consul:
-        image: hashicorp/consul:${CONSUL_VERSION}
+        image: hashicorp/consul:${{ needs.version.outputs.consul_version }}
         ports:
           - 8500:8500
       vault:
-        image: hashicorp/vault:${VAULT_VERSION}
+        image: hashicorp/vault:${{ needs.version.outputs.vault_version }}
         ports:
           - 8200:8200
         env:
