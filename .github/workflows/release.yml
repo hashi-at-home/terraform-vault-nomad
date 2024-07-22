@@ -8,24 +8,35 @@ on:
       - main
 jobs:
   artifact:
-    strategy:
-      matrix:
-        product:
-          - nomad
-          - terraform
-          - vault
-          - consul
+    outputs:
+      terraform_url: ${{ steps.artifact.outputs.terraform_url }}
+      vault_url: ${{ steps.artifact.outputs.vault_url }}
+      consul_url: ${{ steps.artifact.outputs.consul_url }}
+      nomad_url: ${{ steps.artifact.outputs.nomad_url }}
     runs-on: ubuntu-latest
     env:
       RELEASE_URL: https://api.releases.hashicorp.com
     steps:
-      - id: artifact
-        name: Get Latest Version of ${{ matrix.product }}
+      - id: terraform
+        name: Get Latest Version of Terraform
         run: |
-          url=$(curl -s "${RELEASE_URL}/v1/releases/${{ matrix.product }}?limit=20&license_class=oss" | jq -r '.[0].builds[] | select (.arch == "amd64" and .os=="linux").url')
-          echo ${url}
-          echo "${{ matrix.product }}_URL=${url}" >> "$GITHUB_OUTPUT"
-
+          terraform_url=$(curl -s "${RELEASE_URL}/v1/releases/terraform?limit=20&license_class=oss" | jq -r '.[0].builds[] | select (.arch == "amd64" and .os=="linux").url')
+          echo "terraform_url=${terraform_url}" >> "$GITHUB_OUTPUT"
+      - id: vault
+        name: Get Latest Version of Vault
+        run: |
+          vault_url=$(curl -s "${RELEASE_URL}/v1/releases/vault?limit=20&license_class=oss" | jq -r '.[0].builds[] | select (.arch == "amd64" and .os=="linux").url')
+          echo "vault_url=${vault_url}" >> "$GITHUB_OUTPUT"
+      - id: consul
+        name: Get Latest Version of Consul
+        run: |
+          consul_url=$(curl -s "${RELEASE_URL}/v1/releases/consul?limit=20&license_class=oss" | jq -r '.[0].builds[] | select (.arch == "amd64" and .os=="linux").url')
+          echo "consul_url=${consul_url}" >> "$GITHUB_OUTPUT"
+      - id: nomad
+        name: Get Latest Version of Nomad
+        run: |
+          nomad_url=$(curl -s "${RELEASE_URL}/v1/releases/nomad?limit=20&license_class=oss" | jq -r '.[0].builds[] | select (.arch == "amd64" and .os=="linux").url')
+          echo "nomad_url=${nomad_url}" >> "$GITHUB_OUTPUT"
   version:
     strategy:
       matrix:
@@ -35,6 +46,8 @@ jobs:
           - vault
           - consul
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     env:
       RELEASE_URL: https://api.releases.hashicorp.com
     steps:
@@ -59,12 +72,11 @@ jobs:
       VAULT_ADDR: http://localhost:8200
       VAULT_TOKEN: ${{ github.run_id }}
       TF_VAR_nomad_addr: http://localhost:4646
-      VERSIONS: ${GITHUB_OUTPUT}
-      TERRAFORM_URL: ${{ needs.artifact.outputs.terraform_URL }}
+      TERRAFORM_URL: ${{ needs.artifact.outputs.terraform_url }}
       TERRAFORM_VERSION: ${{ needs.version.outputs.terraform_VERSION }}
-      VAULT_URL: ${{ needs.artifact.outputs.vault_URL }}
+      VAULT_URL: ${{ needs.artifact.outputs.vault_url }}
       VAULT_VERSION: ${{ needs.version.outputs.vault_VERSION }}
-      CONSUL_URL: ${{ needs.artifact.outputs.consul_URL }}
+      CONSUL_URL: ${{ needs.artifact.outputs.consul_url }}
       CONSUL_VERSION: ${{ needs.version.outputs.consul_VERSION }}
     runs-on: ubuntu-22.04
     # services:
@@ -87,7 +99,6 @@ jobs:
           VAULT_ADDR: http://localhost:8200
           VAULT_TOKEN: ${{ github.run_id }}
           TF_VAR_nomad_addr: http://localhost:4646
-          VERSIONS: ${GITHUB_OUTPUT}
           TERRAFORM_URL: ${{ needs.artifact.outputs.terraform_URL }}
           TERRAFORM_VERSION: ${{ needs.version.outputs.terraform_VERSION }}
           VAULT_URL: ${{ needs.artifact.outputs.vault_URL }}
@@ -95,7 +106,7 @@ jobs:
           CONSUL_URL: ${{ needs.artifact.outputs.consul_URL }}
           CONSUL_VERSION: ${{ needs.version.outputs.consul_VERSION }}
         run: |
-          echo "${{ needs.artifact.outputs }}"
+          echo "${{ needs.artifact.outputs.consul_URL }}"
           echo "${{ needs.version.outputs }}"
       - name: Checkout code
         uses: 'actions/checkout@v4'
@@ -103,7 +114,7 @@ jobs:
           fetch-depth: 0
       - name: Get latest Terraform
         run: |
-          curl -fSLO ${terraform_URL}
+          curl -fSLO ${TERRAFORM_URL}
           unzip -j terraform_${TERRAFORM_VERSION}_linux_amd64.zip terraform
       - name: Init terraform
         run: ./terraform -chdir=examples/${{ matrix.example }} init
