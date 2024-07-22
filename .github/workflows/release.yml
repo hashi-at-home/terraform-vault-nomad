@@ -24,7 +24,7 @@ jobs:
         run: |
           url=$(curl -s "${RELEASE_URL}/v1/releases/${{ matrix.product }}?limit=20&license_class=oss" | jq -r '.[0].builds[] | select (.arch == "amd64" and .os=="linux").url')
           echo ${url}
-          echo "${{ matrix.product }}_URL=${url}">>$GITHUB_OUTPUT
+          echo "${{ matrix.product }}_URL=${url}" >> "$GITHUB_OUTPUT"
 
   version:
     strategy:
@@ -43,7 +43,7 @@ jobs:
         run: |
           v=$(curl -s "${RELEASE_URL}/v1/releases/${{ matrix.product }}?limit=20&license_class=oss" | jq -r '.[0].version')
           echo $v
-          echo "${{ matrix.product }}_VERSION=$v" >> $GITHUB_OUTPUT
+          echo "${{ matrix.product }}_VERSION=$v" >> "$GITHUB_OUTPUT"
           cat ${GITHUB_OUTPUT}
   validate:
     needs:
