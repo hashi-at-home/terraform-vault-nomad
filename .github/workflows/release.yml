@@ -40,10 +40,10 @@ jobs:
   version:
     runs-on: ubuntu-latest
     outputs:
-      terraform_version: ${{ steps.terraform_version.outputs.version }}
-      consul_version: ${{ steps.consul_version.outputs.version }}
-      vault_version: ${{ steps.vault_version.outputs.version }}
-      nomad_version: ${{ steps.nomad_version.outputs.version }}
+      terraform_version: ${{ steps.terraform_version.outputs.terraform_version }}
+      consul_version: ${{ steps.consul_version.outputs.consul_version }}
+      vault_version: ${{ steps.vault_version.outputs.vault_version }}
+      nomad_version: ${{ steps.nomad_version.outputs.nomad_version }}
     env:
       RELEASE_URL: https://api.releases.hashicorp.com
     steps:
@@ -53,28 +53,24 @@ jobs:
           v=$(curl -s "${RELEASE_URL}/v1/releases/terraform?limit=20&license_class=oss" | jq -r '.[0].version')
           echo $v
           echo "terraform_version=$v" >> "$GITHUB_OUTPUT"
-          cat ${GITHUB_OUTPUT}
       - id: consul_version
         name: Get Latest Version of Consul
         run: |
           v=$(curl -s "${RELEASE_URL}/v1/releases/consul?limit=20&license_class=oss" | jq -r '.[0].version')
           echo $v
           echo "consul_version=$v" >> "$GITHUB_OUTPUT"
-          cat ${GITHUB_OUTPUT}
       - id: vault_version
         name: Get Latest Version of Vault
         run: |
           v=$(curl -s "${RELEASE_URL}/v1/releases/vault?limit=20&license_class=oss" | jq -r '.[0].version')
           echo $v
           echo "vault_version=$v" >> "$GITHUB_OUTPUT"
-          cat ${GITHUB_OUTPUT}
       - id: nomad_version
         name: Get Latest Version of Nomad
         run: |
           v=$(curl -s "${RELEASE_URL}/v1/releases/nomad?limit=20&license_class=oss" | jq -r '.[0].version')
           echo $v
           echo "nomad_version=$v" >> "$GITHUB_OUTPUT"
-          cat ${GITHUB_OUTPUT}
   validate:
     needs:
       - version
