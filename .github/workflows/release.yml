@@ -96,7 +96,7 @@ jobs:
     runs-on: ubuntu-22.04
     services:
       nomad:
-        image: hashicorp/nomad:${NOMAD_VERSION}
+        image: hashicorp/nomad:${{ needs.version.outputs.nomad_version }}
         ports:
           - 4646:4646
       consul:
