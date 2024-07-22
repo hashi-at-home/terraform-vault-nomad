@@ -25,7 +25,7 @@ jobs:
         name: Get Latest Version of ${{ matrix.product }}
         run: |
           url=$(curl -s "${RELEASE_URL}/v1/releases/${{ matrix.product }}?limit=20&license_class=oss" | jq -r '.[0].builds[] | select (.arch == "amd64" and .os=="linux").url')
-          ehco ${url}
+          echo ${url}
           echo "${{ matrix.product }}_URL=${url}">>$GITHUB_OUTPUT
 
   version:
