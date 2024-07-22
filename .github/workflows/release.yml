@@ -40,35 +40,35 @@ jobs:
   version:
     runs-on: ubuntu-latest
     outputs:
-      terraform_version: ${{ steps.terraform.outputs.version }}
-      consul_version: ${{ steps.consul.outputs.version }}
-      vault_version: ${{ steps.vault.outputs.version }}
-      nomad_version: ${{ steps.nomad.outputs.version }}
+      terraform_version: ${{ steps.terraform_version.outputs.version }}
+      consul_version: ${{ steps.consul_version.outputs.version }}
+      vault_version: ${{ steps.vault_version.outputs.version }}
+      nomad_version: ${{ steps.nomad_version.outputs.version }}
     env:
       RELEASE_URL: https://api.releases.hashicorp.com
     steps:
-      - id: terraform
+      - id: terraform_version
         name: Get Latest Version of terraform
         run: |
           v=$(curl -s "${RELEASE_URL}/v1/releases/terraform?limit=20&license_class=oss" | jq -r '.[0].version')
           echo $v
           echo "terraform_version=$v" >> "$GITHUB_OUTPUT"
           cat ${GITHUB_OUTPUT}
-      - id: consul
+      - id: consul_version
         name: Get Latest Version of Consul
         run: |
           v=$(curl -s "${RELEASE_URL}/v1/releases/consul?limit=20&license_class=oss" | jq -r '.[0].version')
           echo $v
           echo "consul_version=$v" >> "$GITHUB_OUTPUT"
           cat ${GITHUB_OUTPUT}
-      - id: vault
+      - id: vault_version
         name: Get Latest Version of Vault
         run: |
           v=$(curl -s "${RELEASE_URL}/v1/releases/vault?limit=20&license_class=oss" | jq -r '.[0].version')
           echo $v
           echo "vault_version=$v" >> "$GITHUB_OUTPUT"
           cat ${GITHUB_OUTPUT}
-      - id: nomad
+      - id: nomad_version
         name: Get Latest Version of Nomad
         run: |
           v=$(curl -s "${RELEASE_URL}/v1/releases/nomad?limit=20&license_class=oss" | jq -r '.[0].version')
@@ -95,7 +95,7 @@ jobs:
       VAULT_VERSION: ${{ needs.version.outputs.vault_version }}
       CONSUL_URL: ${{ needs.artifact.outputs.consul_url }}
       CONSUL_VERSION: ${{ needs.version.outputs.consul_version }}
-      NOMAD_VERSION: ${{ needs.version.outputs.nomada_version }}
+      NOMAD_VERSION: ${{ needs.version.outputs.nomad_version }}
       NOMAD_URL: ${{ needs.artifact.outputs.nomad_url }}
     runs-on: ubuntu-22.04
     # services:
