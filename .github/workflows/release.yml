@@ -84,6 +84,7 @@ jobs:
       NOMAD_ADDR: http://localhost:4646
       VAULT_ADDR: http://localhost:8200
       VAULT_TOKEN: ${{ github.run_id }}
+      NOMAD_TOKEN: ${{ github.run_id }}
       TF_VAR_nomad_addr: http://localhost:4646
       TERRAFORM_URL: ${{ needs.artifact.outputs.terraform_url }}
       TERRAFORM_VERSION: ${{ needs.version.outputs.terraform_version }}
@@ -95,10 +96,6 @@ jobs:
       NOMAD_URL: ${{ needs.artifact.outputs.nomad_url }}
     runs-on: ubuntu-22.04
     services:
-      nomad:
-        image: hashicorp/nomad:${{ needs.version.outputs.nomad_version }}
-        ports:
-          - 4646:4646
       consul:
         image: hashicorp/consul:${{ needs.version.outputs.consul_version }}
         ports:
@@ -110,26 +107,28 @@ jobs:
         env:
           VAULT_DEV_ROOT_TOKEN_ID: ${{ env.VAULT_TOKEN }}
     steps:
-      - name: test
-        run: cat $GITHUB_OUTPUT
-      - name: Seriously, wtf
-        run: |
-          echo "${{ needs.artifact.outputs.consul_url }}"
-          echo "${{ needs.version.outputs.consul_version }}"
       - name: Checkout code
         uses: 'actions/checkout@v4'
         with:
           fetch-depth: 0
-      - name: Get latest Terraform
+      - name: Get Terraform
         run: |
           curl -fSLO ${TERRAFORM_URL}
           unzip -j terraform_${TERRAFORM_VERSION}_linux_amd64.zip terraform
+      - name: Get Nomad
+        run: |
+          curl -fSLO ${NOMAD_URL}
+          unzip -j nomad_${NOMAD_VERSION}_linux_amd64.zip nomad
       - name: Init terraform
         run: ./terraform -chdir=examples/${{ matrix.example }} init
       - name: Validate terraform
         run: ./terraform -chdir=examples/${{ matrix.example }} validate
       - name: Init
         run: ./terraform init
+      - name: Start Nomad
+        run: |
+          ./nomad -agent -dev-vault -server  &
+          echo ${NOMAD_TOKEN} | ./nomad acl booptstrap -
       - name: Test
         run: ./terraform test
   release:
