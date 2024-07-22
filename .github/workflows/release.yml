@@ -127,9 +127,9 @@ jobs:
         run: ./terraform init
       - name: Start Nomad
         run: |
-          ./nomad agent -dev-vault -server  &
-      # - name: Set Nomad ACL token
-        # run: echo ${NOMAD_TOKEN} | ./nomad acl bootstrap -
+          ./nomad agent -server -bootstrap-expect=1 -vault-enabled -vault-token=${VAULT_TOKEN}  &
+      - name: Set Nomad ACL token
+        run: echo ${NOMAD_TOKEN} | ./nomad acl bootstrap -
       - name: Test
         run: ./terraform test
   release:
