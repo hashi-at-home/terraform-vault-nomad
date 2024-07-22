@@ -94,17 +94,21 @@ jobs:
       NOMAD_VERSION: ${{ needs.version.outputs.nomad_version }}
       NOMAD_URL: ${{ needs.artifact.outputs.nomad_url }}
     runs-on: ubuntu-22.04
-    # services:
-    #   consul:
-    #     image: hashicorp/consul:${CONSUL_VERSION}
-    #     ports:
-    #       - 8500:8500
-    #   vault:
-    #     image: hashicorp/vault:${VAULT_VERSION}
-    #     ports:
-    #       - 8200:8200
-    #     env:
-    #       VAULT_DEV_ROOT_TOKEN_ID: ${{ env.VAULT_TOKEN }}
+    services:
+      nomad:
+        image: hashicoprr/nomad:${NOMAD_VERSION}
+        ports:
+          - 4646:4646
+      consul:
+        image: hashicorp/consul:${CONSUL_VERSION}
+        ports:
+          - 8500:8500
+      vault:
+        image: hashicorp/vault:${VAULT_VERSION}
+        ports:
+          - 8200:8200
+        env:
+          VAULT_DEV_ROOT_TOKEN_ID: ${{ env.VAULT_TOKEN }}
     steps:
       - name: test
         run: cat $GITHUB_OUTPUT
