@@ -9,10 +9,10 @@ on:
 jobs:
   artifact:
     outputs:
-      terraform_url: ${{ steps.artifact.outputs.terraform_url }}
-      vault_url: ${{ steps.artifact.outputs.vault_url }}
-      consul_url: ${{ steps.artifact.outputs.consul_url }}
-      nomad_url: ${{ steps.artifact.outputs.nomad_url }}
+      terraform_url: ${{ steps.terraform.outputs.terraform_url }}
+      vault_url: ${{ steps.vault.outputs.vault_url }}
+      consul_url: ${{ steps.consul.outputs.consul_url }}
+      nomad_url: ${{ steps.nomad.outputs.nomad_url }}
     runs-on: ubuntu-latest
     env:
       RELEASE_URL: https://api.releases.hashicorp.com
