@@ -7,7 +7,7 @@ run "acl_token" {
 }
 
 variables {
-    nomad_addr    = "http://nomad.service.consul:4646"
+    nomad_addr    = "http://localhost:4646"
     nomad_backend = "nomad_test"
 }
 
