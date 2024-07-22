@@ -38,25 +38,42 @@ jobs:
           nomad_url=$(curl -s "${RELEASE_URL}/v1/releases/nomad?limit=20&license_class=oss" | jq -r '.[0].builds[] | select (.arch == "amd64" and .os=="linux").url')
           echo "nomad_url=${nomad_url}" >> "$GITHUB_OUTPUT"
   version:
-    strategy:
-      matrix:
-        product:
-          - nomad
-          - terraform
-          - vault
-          - consul
     runs-on: ubuntu-latest
     outputs:
-      version: ${{ steps.version.outputs.version }}
+      terraform_version: ${{ steps.terraform.outputs.version }}
+      consul_version: ${{ steps.consul.outputs.version }}
+      vault_version: ${{ steps.vault.outputs.version }}
+      nomad_version: ${{ steps.nomad.outputs.version }}
     env:
       RELEASE_URL: https://api.releases.hashicorp.com
     steps:
-      - id: version
-        name: Get Latest Version of ${{ matrix.product }}
+      - id: terraform
+        name: Get Latest Version of terraform
         run: |
-          v=$(curl -s "${RELEASE_URL}/v1/releases/${{ matrix.product }}?limit=20&license_class=oss" | jq -r '.[0].version')
+          v=$(curl -s "${RELEASE_URL}/v1/releases/terraform?limit=20&license_class=oss" | jq -r '.[0].version')
           echo $v
-          echo "${{ matrix.product }}_VERSION=$v" >> "$GITHUB_OUTPUT"
+          echo "terraform_version=$v" >> "$GITHUB_OUTPUT"
+          cat ${GITHUB_OUTPUT}
+      - id: consul
+        name: Get Latest Version of Consul
+        run: |
+          v=$(curl -s "${RELEASE_URL}/v1/releases/consul?limit=20&license_class=oss" | jq -r '.[0].version')
+          echo $v
+          echo "consul_version=$v" >> "$GITHUB_OUTPUT"
+          cat ${GITHUB_OUTPUT}
+      - id: vault
+        name: Get Latest Version of Vault
+        run: |
+          v=$(curl -s "${RELEASE_URL}/v1/releases/vault?limit=20&license_class=oss" | jq -r '.[0].version')
+          echo $v
+          echo "vault_version=$v" >> "$GITHUB_OUTPUT"
+          cat ${GITHUB_OUTPUT}
+      - id: nomad
+        name: Get Latest Version of Nomad
+        run: |
+          v=$(curl -s "${RELEASE_URL}/v1/releases/nomad?limit=20&license_class=oss" | jq -r '.[0].version')
+          echo $v
+          echo "nomad_version=$v" >> "$GITHUB_OUTPUT"
           cat ${GITHUB_OUTPUT}
   validate:
     needs:
@@ -73,11 +90,13 @@ jobs:
       VAULT_TOKEN: ${{ github.run_id }}
       TF_VAR_nomad_addr: http://localhost:4646
       TERRAFORM_URL: ${{ needs.artifact.outputs.terraform_url }}
-      TERRAFORM_VERSION: ${{ needs.version.outputs.terraform_VERSION }}
+      TERRAFORM_VERSION: ${{ needs.version.outputs.terraform_version }}
       VAULT_URL: ${{ needs.artifact.outputs.vault_url }}
-      VAULT_VERSION: ${{ needs.version.outputs.vault_VERSION }}
+      VAULT_VERSION: ${{ needs.version.outputs.vault_version }}
       CONSUL_URL: ${{ needs.artifact.outputs.consul_url }}
-      CONSUL_VERSION: ${{ needs.version.outputs.consul_VERSION }}
+      CONSUL_VERSION: ${{ needs.version.outputs.consul_version }}
+      NOMAD_VERSION: ${{ needs.version.outputs.nomada_version }}
+      NOMAD_URL: ${{ needs.artifact.outputs.nomad_url }}
     runs-on: ubuntu-22.04
     # services:
     #   consul:
@@ -94,20 +113,9 @@ jobs:
       - name: test
         run: cat $GITHUB_OUTPUT
       - name: Seriously, wtf
-        env:
-          NOMAD_ADDR: http://localhost:4646
-          VAULT_ADDR: http://localhost:8200
-          VAULT_TOKEN: ${{ github.run_id }}
-          TF_VAR_nomad_addr: http://localhost:4646
-          TERRAFORM_URL: ${{ needs.artifact.outputs.terraform_URL }}
-          TERRAFORM_VERSION: ${{ needs.version.outputs.terraform_VERSION }}
-          VAULT_URL: ${{ needs.artifact.outputs.vault_URL }}
-          VAULT_VERSION: ${{ needs.version.outputs.vault_VERSION }}
-          CONSUL_URL: ${{ needs.artifact.outputs.consul_URL }}
-          CONSUL_VERSION: ${{ needs.version.outputs.consul_VERSION }}
         run: |
-          echo "${{ needs.artifact.outputs.consul_URL }}"
-          echo "${{ needs.version.outputs }}"
+          echo "${{ needs.artifact.outputs.consul_url }}"
+          echo "${{ needs.version.outputs.consul_version }}"
       - name: Checkout code
         uses: 'actions/checkout@v4'
         with:
