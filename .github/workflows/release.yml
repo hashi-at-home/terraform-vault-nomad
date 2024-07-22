@@ -127,7 +127,7 @@ jobs:
         run: ./terraform init
       - name: Start Nomad
         run: |
-          ./nomad -agent -dev-vault -server  &
+          ./nomad agent -dev-vault -server  &
           echo ${NOMAD_TOKEN} | ./nomad acl booptstrap -
       - name: Test
         run: ./terraform test
