@@ -84,7 +84,6 @@ jobs:
       NOMAD_ADDR: http://localhost:4646
       VAULT_ADDR: http://localhost:8200
       VAULT_TOKEN: ${{ github.run_id }}
-      NOMAD_TOKEN: ${{ github.run_id }}
       TF_VAR_nomad_addr: http://localhost:4646
       TERRAFORM_URL: ${{ needs.artifact.outputs.terraform_url }}
       TERRAFORM_VERSION: ${{ needs.version.outputs.terraform_version }}
@@ -131,6 +130,7 @@ jobs:
       - name: Test
         run: |
           export NOMAD_TOKEN=$(./nomad acl bootstrap -json | jq -r .SecretID)
+          echo ${NOMAD_TOKEN}
           ./terraform test
   release:
     needs:
