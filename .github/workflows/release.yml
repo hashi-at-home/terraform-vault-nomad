@@ -84,7 +84,7 @@ jobs:
       NOMAD_ADDR: http://0.0.0.0:4646
       VAULT_ADDR: http://0.0.0.0:8200
       VAULT_TOKEN: ${{ github.run_id }}
-      TF_VAR_nomad_addr: http://localhost:4646
+      TF_VAR_nomad_addr: http://0.0.0.0:4646
       TERRAFORM_URL: ${{ needs.artifact.outputs.terraform_url }}
       TERRAFORM_VERSION: ${{ needs.version.outputs.terraform_version }}
       VAULT_URL: ${{ needs.artifact.outputs.vault_url }}
