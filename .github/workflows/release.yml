@@ -127,6 +127,11 @@ jobs:
       - name: Start Nomad
         run: |
           ./nomad agent -server -bootstrap-expect=1 -vault-enabled -vault-token=${VAULT_TOKEN}  -data-dir=/tmp -acl-enabled &
+      - name: Wait for Nomad to stabilise
+        run: |
+          sleep 5
+      - name: Setup Nomad vault
+        run: |
           ./nomad setup vault -y
           ./nomad setup vault -check
       - name: Test
