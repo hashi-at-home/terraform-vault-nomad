@@ -128,6 +128,7 @@ jobs:
         run: |
           ./nomad agent -server -bootstrap-expect=1 -vault-enabled -vault-token=${VAULT_TOKEN}  -data-dir=/tmp -acl-enabled &
           ./nomad setup vault -y
+          ./nomad setup vault -check
       - name: Test
         run: |
           export NOMAD_TOKEN=$(./nomad acl bootstrap -json | jq -r .SecretID)
