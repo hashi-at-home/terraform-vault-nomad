@@ -55,6 +55,7 @@ No modules.
 
 | Name | Type |
 |------|------|
+| [nomad_acl_auth_method.vault](https://registry.terraform.io/providers/hashicorp/nomad/latest/docs/resources/acl_auth_method) | resource |
 | [nomad_acl_token.management](https://registry.terraform.io/providers/hashicorp/nomad/latest/docs/resources/acl_token) | resource |
 | [vault_jwt_auth_backend.nomad](https://registry.terraform.io/providers/hashicorp/vault/latest/docs/resources/jwt_auth_backend) | resource |
 | [vault_jwt_auth_backend_role.nomad_jobs](https://registry.terraform.io/providers/hashicorp/vault/latest/docs/resources/jwt_auth_backend_role) | resource |
