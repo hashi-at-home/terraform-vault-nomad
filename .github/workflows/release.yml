@@ -131,6 +131,7 @@ jobs:
         run: |
           export NOMAD_TOKEN=$(./nomad acl bootstrap -json | jq -r .SecretID)
           echo ${NOMAD_TOKEN}
+          ./nomad status
           ./terraform test
   release:
     needs:
