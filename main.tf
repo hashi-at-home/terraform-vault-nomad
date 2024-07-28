@@ -55,10 +55,10 @@ resource "vault_policy" "nomad_workloads" {
 }
 
 resource "vault_jwt_auth_backend" "nomad" {
-  description = "Vault JWT Auth for Nomad"
-  path        = var.nomad_jwt_auth_path
-  type        = "jwt"
-  # jwks_url           = "${var.nomad_addr}/.well-known/jwks.json"
+  description        = "Vault JWT Auth for Nomad"
+  path               = var.nomad_jwt_auth_path
+  type               = "jwt"
+  jwks_url           = "${var.nomad_addr}/.well-known/jwks.json"
   jwt_supported_algs = ["RS256", "EdDSA"]
   # default_role       = vault_jwt_auth_backend_role.nomad_jobs.role_name
   # default_role = "nomad-workloads"
