@@ -7,41 +7,100 @@ on:
     branches:
       - main
 jobs:
-  hashi_versions:
-    strategy:
-      matrix:
-        product:
-          - nomad
-          - terraform
-          - vault
+  artifact:
+    outputs:
+      terraform_url: ${{ steps.terraform.outputs.terraform_url }}
+      vault_url: ${{ steps.vault.outputs.vault_url }}
+      consul_url: ${{ steps.consul.outputs.consul_url }}
+      nomad_url: ${{ steps.nomad.outputs.nomad_url }}
     runs-on: ubuntu-latest
     env:
       RELEASE_URL: https://api.releases.hashicorp.com
     steps:
-      - name: Get Latest Version of ${{ matrix.product }}
-        run: curl -s https://${RELEASES_URL}/v1/releases/${{ matrix.product }}?limit=20&license_class=oss | jq -r '.[0].builds[] | select (.arch == "amd64" and .os=="linux").url' >> $GITHUB_OUTPUT
-
+      - id: terraform
+        name: Get Latest Version of Terraform
+        run: |
+          terraform_url=$(curl -s "${RELEASE_URL}/v1/releases/terraform?limit=20&license_class=oss" | jq -r '.[0].builds[] | select (.arch == "amd64" and .os=="linux").url')
+          echo "terraform_url=${terraform_url}" >> "$GITHUB_OUTPUT"
+      - id: vault
+        name: Get Latest Version of Vault
+        run: |
+          vault_url=$(curl -s "${RELEASE_URL}/v1/releases/vault?limit=20&license_class=oss" | jq -r '.[0].builds[] | select (.arch == "amd64" and .os=="linux").url')
+          echo "vault_url=${vault_url}" >> "$GITHUB_OUTPUT"
+      - id: consul
+        name: Get Latest Version of Consul
+        run: |
+          consul_url=$(curl -s "${RELEASE_URL}/v1/releases/consul?limit=20&license_class=oss" | jq -r '.[0].builds[] | select (.arch == "amd64" and .os=="linux").url')
+          echo "consul_url=${consul_url}" >> "$GITHUB_OUTPUT"
+      - id: nomad
+        name: Get Latest Version of Nomad
+        run: |
+          nomad_url=$(curl -s "${RELEASE_URL}/v1/releases/nomad?limit=20&license_class=oss" | jq -r '.[0].builds[] | select (.arch == "amd64" and .os=="linux").url')
+          echo "nomad_url=${nomad_url}" >> "$GITHUB_OUTPUT"
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      terraform_version: ${{ steps.terraform_version.outputs.terraform_version }}
+      consul_version: ${{ steps.consul_version.outputs.consul_version }}
+      vault_version: ${{ steps.vault_version.outputs.vault_version }}
+      nomad_version: ${{ steps.nomad_version.outputs.nomad_version }}
+    env:
+      RELEASE_URL: https://api.releases.hashicorp.com
+    steps:
+      - id: terraform_version
+        name: Get Latest Version of terraform
+        run: |
+          v=$(curl -s "${RELEASE_URL}/v1/releases/terraform?limit=20&license_class=oss" | jq -r '.[0].version')
+          echo $v
+          echo "terraform_version=$v" >> "$GITHUB_OUTPUT"
+      - id: consul_version
+        name: Get Latest Version of Consul
+        run: |
+          v=$(curl -s "${RELEASE_URL}/v1/releases/consul?limit=20&license_class=oss" | jq -r '.[0].version')
+          echo $v
+          echo "consul_version=$v" >> "$GITHUB_OUTPUT"
+      - id: vault_version
+        name: Get Latest Version of Vault
+        run: |
+          v=$(curl -s "${RELEASE_URL}/v1/releases/vault?limit=20&license_class=oss" | jq -r '.[0].version')
+          echo $v
+          echo "vault_version=$v" >> "$GITHUB_OUTPUT"
+      - id: nomad_version
+        name: Get Latest Version of Nomad
+        run: |
+          v=$(curl -s "${RELEASE_URL}/v1/releases/nomad?limit=20&license_class=oss" | jq -r '.[0].version')
+          echo $v
+          echo "nomad_version=$v" >> "$GITHUB_OUTPUT"
   validate:
     needs:
-      - hashi_versions
+      - version
+      - artifact
     strategy:
       matrix:
         example:
           - simple
     name: validate
     env:
-      NOMAD_ADDR: http://localhost:4646
-      VAULT_ADDR: http://localhost:8200
-      VAULT_TOKEN: ${{ github.run_id}}
-      TF_VAR_nomad_addr: http://localhost:4646
+      NOMAD_ADDR: http://0.0.0.0:4646
+      VAULT_ADDR: http://0.0.0.0:8200
+      VAULT_TOKEN: ${{ github.run_id }}
+      TF_VAR_nomad_addr: http://0.0.0.0:4646
+      TERRAFORM_URL: ${{ needs.artifact.outputs.terraform_url }}
+      TERRAFORM_VERSION: ${{ needs.version.outputs.terraform_version }}
+      VAULT_URL: ${{ needs.artifact.outputs.vault_url }}
+      VAULT_VERSION: ${{ needs.version.outputs.vault_version }}
+      CONSUL_URL: ${{ needs.artifact.outputs.consul_url }}
+      CONSUL_VERSION: ${{ needs.version.outputs.consul_version }}
+      NOMAD_VERSION: ${{ needs.version.outputs.nomad_version }}
+      NOMAD_URL: ${{ needs.artifact.outputs.nomad_url }}
     runs-on: ubuntu-22.04
     services:
       consul:
-        image: hashicorp/consul:1.19.1
+        image: hashicorp/consul:${{ needs.version.outputs.consul_version }}
         ports:
           - 8500:8500
       vault:
-        image: hashicorp/vault:1.17.2
+        image: hashicorp/vault:${{ needs.version.outputs.vault_version }}
         ports:
           - 8200:8200
         env:
@@ -51,18 +110,32 @@ jobs:
         uses: 'actions/checkout@v4'
         with:
           fetch-depth: 0
-      - name: Get latest Terraform
+      - name: Get Terraform
         run: |
-          curl -fSLO https://releases.hashicorp.com/terraform/1.9.2/terraform_1.9.2_linux_amd64.zip
-          unzip -j terraform_1.9.2_linux_amd64.zip terraform
+          curl -fSLO ${TERRAFORM_URL}
+          unzip -j terraform_${TERRAFORM_VERSION}_linux_amd64.zip terraform
+      - name: Get Nomad
+        run: |
+          curl -fSLO ${NOMAD_URL}
+          unzip -j nomad_${NOMAD_VERSION}_linux_amd64.zip nomad
       - name: Init terraform
         run: ./terraform -chdir=examples/${{ matrix.example }} init
       - name: Validate terraform
         run: ./terraform -chdir=examples/${{ matrix.example }} validate
       - name: Init
         run: ./terraform init
+      - name: Start Nomad
+        run: |
+          ./nomad agent -server -bootstrap-expect=1 -vault-enabled -vault-token=${VAULT_TOKEN}  -data-dir=/tmp -acl-enabled &
+      - name: Wait for Nomad to stabilise
+        run: |
+          sleep 5
       - name: Test
-        run: ./terraform test
+        run: |
+          export NOMAD_TOKEN=$(./nomad acl bootstrap -json | jq -r .SecretID)
+          echo ${NOMAD_TOKEN}
+          ./nomad status
+          ./terraform test
   release:
     needs:
       - validate

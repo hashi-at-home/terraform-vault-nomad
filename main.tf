@@ -6,6 +6,19 @@ resource "nomad_acl_token" "management" {
   name = "Vault-managed"
 }
 
+resource "nomad_acl_auth_method" "vault" {
+  name           = "vault"
+  type           = "JWT"
+  token_locality = "local"
+  max_token_ttl  = "86400s"
+  default        = true
+  config {
+    jwks_url        = "http://${var.nomad_addr}/.well-known/jwks.json"
+    bound_audiences = ["vault.io"]
+  }
+
+}
+
 resource "vault_nomad_secret_backend" "nomad" {
   backend                   = var.nomad_backend
   description               = "Nomad secrets ${var.nomad_backend}"
@@ -61,7 +74,7 @@ resource "vault_jwt_auth_backend" "nomad" {
   jwks_url           = "${var.nomad_addr}/.well-known/jwks.json"
   jwt_supported_algs = ["RS256", "EdDSA"]
   # default_role       = vault_jwt_auth_backend_role.nomad_jobs.role_name
-  default_role = "nomad-workloads"
+  # default_role = "nomad-workloads"
 }
 
 
