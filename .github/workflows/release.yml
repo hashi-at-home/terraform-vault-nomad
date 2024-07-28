@@ -81,8 +81,8 @@ jobs:
           - simple
     name: validate
     env:
-      NOMAD_ADDR: http://localhost:4646
-      VAULT_ADDR: http://localhost:8200
+      NOMAD_ADDR: http://0.0.0.0:4646
+      VAULT_ADDR: http://0.0.0.0:8200
       VAULT_TOKEN: ${{ github.run_id }}
       TF_VAR_nomad_addr: http://localhost:4646
       TERRAFORM_URL: ${{ needs.artifact.outputs.terraform_url }}
