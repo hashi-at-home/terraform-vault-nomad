@@ -93,7 +93,7 @@ jobs:
       CONSUL_VERSION: ${{ needs.version.outputs.consul_version }}
       NOMAD_VERSION: ${{ needs.version.outputs.nomad_version }}
       NOMAD_URL: ${{ needs.artifact.outputs.nomad_url }}
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     services:
       consul:
         image: hashicorp/consul:${{ needs.version.outputs.consul_version }}
