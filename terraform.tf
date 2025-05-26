@@ -12,7 +12,7 @@ terraform {
   required_providers {
     vault = {
       source  = "hashicorp/vault"
-      version = "~> 4"
+      version = "~> 5"
     }
     nomad = {
       source  = "hashicorp/nomad"
